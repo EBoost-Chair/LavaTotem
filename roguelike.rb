@@ -1,44 +1,30 @@
+# LavaTotem by Wire2Brain<2754887003@qq.com>
+# *Important:This copy of LavaTotem is a TEST VERSION 
+# ===Game System===
 $leadder=[0,0]
 $player=[0,0]
-$enemy=[0,0]
 $tr=[0,0]
-$efoot=0
 $hp=100
 $mp=100
-$died=0
 $foot=0
 $luck=0
 $floor=1
 $buff_af=0
 $name=""
+$mn=0
 $dict=["Cereal Bar","Cereal Bar(Extended)","Chocolate Bar","Vacuumed Food","Vacummed Food(Extended)","S.V.F","Vitamin AF","Supper(Boxed!)","Nice Supper(Boxed!)","Super Supper(Boxed!)","Bronze Coin","Silver Coin","Gold Coin","\"Gold\" Coin","Drill","Laser Drill","Lava Gun","Coffee(Decaffeine)","Coffee","Coffee(Extended)","Monster Drink","Final Energy","Changer","Extender","Forget Pill"]
 $team="Union"
-$bpack=[] 
-puts "LavaTotem"
-puts "Please tell me your name:"
-print ">"
-$name=gets().chop!
-loop do
-  puts "LavaTotem"
-  puts "Please Select your team:"
-  puts "[1]Faith"
-  puts "[2]Union"
-  puts "[3]Chaos"
-  print ">"
-  a=gets().to_i
-  if a==1
-    $team="Faith"
-    break
-  end
-  if a==2
-    $team="Union"
-    break
-  end
-  if a==3
-    $team="Chaos"
-    break
-  end
-end
+$bpack=[]
+# ====
+# method:mapGene
+# argument:no
+# usage:use this to generate a new map
+# * Important:use this will add 50 magic
+# * if you do not want to add magic
+# * use code like this:
+#     mapGene()
+#     $mp=$mp-50
+# ====
 def mapGene()
   $died=0
   $mp=$mp+50
@@ -47,7 +33,8 @@ def mapGene()
   $leadder[1]=Random.rand(10)
   $player[0]=Random.rand(10)
   $player[1]=Random.rand(10)
-  if Random.rand(20) == 7
+  $mn=Random.rand(4)+1
+  if Random.rand(10) == 7
     $luck=1 
     $tr[0]=Random.rand(10)
     $tr[1]=Random.rand(10)
@@ -62,15 +49,20 @@ def mapGene()
   end
   $Map[$leadder[0]][$leadder[1]]=9
   $Map[$player[0]][$player[1]]=10
-  $enemy[0]=Random.rand(10)
-  $enemy[1]=Random.rand(10) 
-  $Map[$enemy[0]][$enemy[1]]=8
+  $mn.times do |i|
+    $Map[Random.rand(10)][Random.rand(10)]=8
+  end
   if $luck == 1
     $Map[$tr[0]][$tr[1]]=11
     $luck=0
   end
   $Map.push([4,4,4,4,4,4,4,4,4,4])
 end
+# ====
+# method:mapRend
+# argument:no
+# usage:rend the map
+# ====
 def mapRend()
   $Map.each do |i|
     i.each do |j|
@@ -94,21 +86,23 @@ def mapRend()
     print "\n"
   end
 end
-
-def moveEnemy()
+# ====
+# method:moveEnemy
+# arguments:x(int),y(int) => Enemy's position
+# usage:use this to move enemy
+# *Important:Enemy's AI will be added to this method in the future
+# ====
+def moveEnemy(x,y)
   such=Random.rand(5)
   if such==1
-    aim=$Map[$enemy[0]-1][$enemy[1]]
+    aim=$Map[x-1][y]
     if aim==0
-      $Map[$enemy[0]][$enemy[1]]=0
-      $enemy[0]=$enemy[0]-1
-      $Map[$enemy[0]][$enemy[1]]=8
-      $efoot=aim
+      $Map[x][y]=0
+      $Map[x-1][y]=8
     end
     if aim == 5
       puts "Enemy was killed by lava!"
-      $Map[$enemy[0]][$enemy[1]]=0
-      $died=1
+      $Map[x][y]=0
     end
     if aim == 10
       puts "Enemy attacks you!"
@@ -116,48 +110,44 @@ def moveEnemy()
     end
   end
   if such==2
-    aim=$Map[$enemy[0]+1][$enemy[1]]
+    aim=$Map[x+1][y]
     if aim==0
-      $Map[$enemy[0]][$enemy[1]]=0
-      $enemy[0]=$enemy[0]+1
-      $Map[$enemy[0]][$enemy[1]]=8
-      $efoot=aim
+      $Map[x][y]=0
+      $Map[x+1][y]=8
     end
     if aim == 5
-      $Map[$enemy[0]][$enemy[1]]=0
-      $died=1
+      $Map[x][y]=0
       puts "Enemy was killed by lava!"
     end
   end
   if such==4
-    aim=$Map[$enemy[0]][$enemy[1]-1]
+    aim=$Map[x][y-1]
     if aim==0
-      $Map[$enemy[0]][$enemy[1]]=0
-      $enemy[1]=$enemy[1]-1
-      $Map[$enemy[0]][$enemy[1]]=8
-      $efoot=aim
+      $Map[x][y]=0
+      $Map[x][y-1]=8
     end
     if aim == 5
       puts "Enemy was killed by lava!"
-      $Map[$enemy[0]][$enemy[1]]=0
-      $died=1
+      $Map[x][y]=0
     end
   end
   if such==3
-    aim=$Map[$enemy[0]][$enemy[1]+1]
+    aim=$Map[x][y+1]
     if aim==0
-      $Map[$enemy[0]][$enemy[1]]=0
-      $enemy[1]=$enemy[1]+1
-      $Map[$enemy[0]][$enemy[1]]=8
-      $efoot=aim
+      $Map[x][y]=0
+      $Map[x][y+1]=8
     end
     if aim == 5
       puts "Enemy was killed by lava!"
-      $Map[$enemy[0]][$enemy[1]]=0
-      $died=1
+      $Map[x][y]=0
     end
   end
 end
+# ====
+# method:move
+# arguments:position(int)
+# usage:use this to move player
+# ====
 def move(such)
   if such==1
     aim=$Map[$player[0]-1][$player[1]]
@@ -268,12 +258,22 @@ def move(such)
     end
   end
 end
+# ====
+# method:showBpack
+# arguments:no
+# usage:use this to show what's in the backpack
+# ====
 def showBpack()
   puts "Backpack:"
   $bpack.each do |i|
     puts $dict[i]
   end
 end
+# ====
+# method:magic
+# argument:magic code(int)
+# usage:use this to use magic according to the team setting
+# ====
 def magic(such)
   if $team=="Chaos"
     if such == 1 && $hp <= 30
@@ -314,41 +314,105 @@ def magic(such)
     end
   end
 end
+# ====
+# method:help
+# argument:no
+# usage:use this to show the LavaTotem Help
+# ====
+def help()
+  puts "LavaTotem Help"
+  puts " m[1-4] move 1-4 is position.(e.g m1)"
+  puts " p check the backpack"
+  puts " u[1-3] use magic.(e.g. u1)"
+  puts " b[number] use items.(e.g. b1)"
+end
+# ====
+# method:showStatus
+# argument:no
+# usage:show player's status
+# ====
+def showStatus()
+  puts "Name:"+$name
+  puts "Team:"+$team
+  puts "Floor:"+$floor.to_s
+  puts "Health:"+$hp.to_s
+  puts "Magic:"+$mp.to_s
+end
+# ====
+# method:useItem
+# argument:backpack code(int)
+# usage:use item
+# *Important:"backpack code" is a number that starts from 1
+# *it isn't the index of $bpack
+# ====
+def useItem(bp)
+  if $bpack.size < bp
+    puts "Item does not exist."
+  else
+    puts "You use:"+$dict[$bpack[bp.to_i-1]]
+  end
+end
+# ====
+# method:gameOver
+# argument:no
+# usage:show Game Over
+# ====
+def gameOver()
+  puts $name+" died,Game Over."
+  puts "You finished "+$floor.to_s+" floors!"
+  exit()
+end
+# ===Game Starts===
+puts "LavaTotem"
+puts "Please tell me your name:"
+print ">"
+$name=gets().chop!
+loop do
+  puts "LavaTotem"
+  puts "Please Select your team:"
+  puts "[1]Faith"
+  puts "[2]Union"
+  puts "[3]Chaos"
+  print ">"
+  a=gets().to_i
+  if a==1
+    $team="Faith"
+    break
+  end
+  if a==2
+    $team="Union"
+    break
+  end
+  if a==3
+    $team="Chaos"
+    break
+  end
+end
 mapGene()
 $mp=$mp-50
 mapRend()
 loop do
-  if $died==0
-    moveEnemy()
+  10.times do |i|
+    10.times do |j|
+      if $Map[i][j]==8
+        moveEnemy(i,j)
+      end
+    end
   end
   if $hp==0
-    puts "Game Over"
-    puts "You finished "+$floor.to_s+" floors!"
-    exit()
+    gameOver()
   end
   print ">>"
   a=gets()
   if /^s/ =~ a
-    puts "Name:"+$name
-    puts "Team:"+$team
-    puts "Floor:"+$floor.to_s
-    puts "Health:"+$hp.to_s
-    puts "Magic:"+$mp.to_s
+    showStatus()
   end
   if /^b/ =~ a
     a.slice!(0)
-    if $bpack.size < a.to_i
-      puts "Item does not exist."
-    else
-      puts "You use:"+$dict[$bpack[a.to_i-1]]
-    end
+    useItem(a.to_i())
   end
   if /^h/ =~ a
-    puts "LavaTotem Help"
-    puts " m[1-4] move 1-4 is position.(e.g m1)"
-    puts " p check the backpack"
-    puts " u[1-3] use magic.(e.g. u1)"
-    puts " b[number] use items.(e.g. b1)"
+    help()
   end
   if /^p/ =~ a
     showBpack()
