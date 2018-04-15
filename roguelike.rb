@@ -33,6 +33,10 @@ def mapGene()
   $leadder[1]=Random.rand(10)
   $player[0]=Random.rand(10)
   $player[1]=Random.rand(10)
+  if $player[0]==$leadder[0] && $player[1]==$leadder[1]
+    $player[0]=Random.rand(10)
+    $player[1]=Random.rand(10)
+  end
   $mn=Random.rand(4)+1
   if Random.rand(10) == 7
     $luck=1 
@@ -100,10 +104,6 @@ def moveEnemy(x,y)
       $Map[x][y]=0
       $Map[x-1][y]=8
     end
-    if aim == 5
-      puts "Enemy was killed by lava!"
-      $Map[x][y]=0
-    end
     if aim == 10
       puts "Enemy attacks you!"
       $hp=$hp-20
@@ -115,9 +115,9 @@ def moveEnemy(x,y)
       $Map[x][y]=0
       $Map[x+1][y]=8
     end
-    if aim == 5
-      $Map[x][y]=0
-      puts "Enemy was killed by lava!"
+    if aim == 10
+      puts "Enemy attacks you!"
+      $hp=$hp-20
     end
   end
   if such==4
@@ -126,9 +126,9 @@ def moveEnemy(x,y)
       $Map[x][y]=0
       $Map[x][y-1]=8
     end
-    if aim == 5
-      puts "Enemy was killed by lava!"
-      $Map[x][y]=0
+    if aim == 10
+      puts "Enemy attacks you!"
+      $hp=$hp-20
     end
   end
   if such==3
@@ -137,9 +137,9 @@ def moveEnemy(x,y)
       $Map[x][y]=0
       $Map[x][y+1]=8
     end
-    if aim == 5
-      puts "Enemy was killed by lava!"
-      $Map[x][y]=0
+    if aim == 10
+      puts "Enemy attacks you!"
+      $hp=$hp-20
     end
   end
 end
