@@ -71,7 +71,7 @@ def mapRend()
   $Map.each do |i|
     i.each do |j|
       if j==10
-        print "@"
+        print "\033[1m@\033[0m"
       elsif j==0
         print " "
       elsif j==4
@@ -390,7 +390,6 @@ loop do
 end
 mapGene()
 $mp=$mp-50
-mapRend()
 loop do
   10.times do |i|
     10.times do |j|
@@ -402,29 +401,32 @@ loop do
   if $hp==0
     gameOver()
   end
-  print ">>"
-  a=gets()
-  if /^s/ =~ a
-    showStatus()
-  end
-  if /^b/ =~ a
-    a.slice!(0)
-    useItem(a.to_i())
-  end
-  if /^h/ =~ a
-    help()
-  end
-  if /^p/ =~ a
-    showBpack()
-  end
-  if /^m/ =~ a
-    a.slice!(0)
-    move(a.to_i)
-  end
-  if /^u/ =~ a
-    a.slice!(0)
-    magic(a.to_i)
-  end
+  loop do
+    mapRend()
+    print "]"
+    a=gets()
+    if /^s/ =~ a
+      showStatus()
+    elsif /^b/ =~ a
+      a.slice!(0)
+      useItem(a.to_i())
+      break
+    elsif /^h/ =~ a
+      help()
+      break
+    elsif /^p/ =~ a
+      showBpack()
+    elsif /^m/ =~ a
+      a.slice!(0)
+      move(a.to_i)
+      break
+    elsif /^u/ =~ a
+      a.slice!(0)
+      magic(a.to_i)
+      break
+    else
+      puts "Error:Invalid Command.Use \"h\" or \"help\" for Help."
+    end
+   end
   puts
-  mapRend()
 end
