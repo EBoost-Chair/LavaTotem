@@ -1,5 +1,5 @@
 # LavaTotem by Wire2Brain<2754887003@qq.com>
-# *Important:This copy of LavaTotem is a TEST VERSION 
+# *Important:This copy of LavaTotem is a TEST VERSION
 # ===Game System===
 $leadder=[0,0]
 $player=[0,0]
@@ -9,12 +9,12 @@ $mp=100
 $foot=0
 $luck=0
 $floor=1
-$buff_af=0
 $name=""
 $mn=0
 $dict=["Cereal Bar","Cereal Bar(Extended)","Chocolate Bar","Vacuumed Food","Vacummed Food(Extended)","S.V.F","Vitamin AF","Supper(Boxed!)","Nice Supper(Boxed!)","Super Supper(Boxed!)","Bronze Coin","Silver Coin","Gold Coin","\"Gold\" Coin","Drill","Laser Drill","Lava Gun","Coffee(Decaffeine)","Coffee","Coffee(Extended)","Monster Drink","Final Energy","Changer","Extender","Forget Pill"]
 $team="Union"
 $bpack=[]
+$cache=""
 # ====
 # method:mapGene
 # argument:no
@@ -26,25 +26,26 @@ $bpack=[]
 #     $mp=$mp-50
 # ====
 def mapGene()
-  $died=0
+  k=Random.rand(5)+10
+  p=Random.rand(5)+10
   $mp=$mp+50
-  $Map=[[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0]]
-  $leadder[0]=Random.rand(10)
-  $leadder[1]=Random.rand(10)
-  $player[0]=Random.rand(10)
-  $player[1]=Random.rand(10)
+  $Map = Array.new(k) { Array.new(p, 0) }
+  $leadder[0]=Random.rand(k)
+  $leadder[1]=Random.rand(p)
+  $player[0]=Random.rand(k)
+  $player[1]=Random.rand(p)
   if $player[0]==$leadder[0] && $player[1]==$leadder[1]
-    $player[0]=Random.rand(10)
-    $player[1]=Random.rand(10)
+    $player[0]=Random.rand(k)
+    $player[1]=Random.rand(p)
   end
   $mn=Random.rand(4)+1
   if Random.rand(10) == 7
     $luck=1 
-    $tr[0]=Random.rand(10)
-    $tr[1]=Random.rand(10)
+    $tr[0]=Random.rand(k)
+    $tr[1]=Random.rand(p)
   end
-  10.times do |j|
-    10.times do |i|
+  k.times do |j|
+    p.times do |i|
       $Map[j][i]=Random.rand(6)
       if $Map[j][i]<4
         $Map[j][i]=0
@@ -60,7 +61,7 @@ def mapGene()
     $Map[$tr[0]][$tr[1]]=11
     $luck=0
   end
-  $Map.push([4,4,4,4,4,4,4,4,4,4])
+  $Map.push(Array.new(p,4))
 end
 # ====
 # method:mapRend
@@ -105,7 +106,7 @@ def moveEnemy(x,y)
       $Map[x-1][y]=8
     end
     if aim == 10
-      puts "Enemy attacks you!"
+      message("Enemy attacked you!\n")
       $hp=$hp-20
     end
   end
@@ -116,7 +117,7 @@ def moveEnemy(x,y)
       $Map[x+1][y]=8
     end
     if aim == 10
-      puts "Enemy attacks you!"
+      message("Enemy attacked you!\n")
       $hp=$hp-20
     end
   end
@@ -127,7 +128,7 @@ def moveEnemy(x,y)
       $Map[x][y-1]=8
     end
     if aim == 10
-      puts "Enemy attacks you!"
+      message("Enemy attacked you!\n")
       $hp=$hp-20
     end
   end
@@ -138,7 +139,7 @@ def moveEnemy(x,y)
       $Map[x][y+1]=8
     end
     if aim == 10
-      puts "Enemy attacks you!"
+      message("Enemy attacked you!\n")
       $hp=$hp-20
     end
   end
@@ -158,17 +159,17 @@ def move(such)
       $foot=aim
     end
     if aim == 11
-      puts "You get the treasure!"
+      message("You got the treasure.\n")
       $bpack.push(Random.rand(25))
       $Map[$player[0]-1][$player[1]]=0
     end
     if aim == 9
-      puts "You can goes to the next floor!"
+      message("You arrived at the next floor.\n")
       $floor=$floor+1
       mapGene()
     end
     if aim == 5
-      puts "Ouch!You stepped on the lava!"
+      message("You stepped on the lava and the lava hurt you.\n")
       $hp=$hp-10
       $Map[$player[0]][$player[1]]=$foot
       $player[0]=$player[0]-1
@@ -179,7 +180,7 @@ def move(such)
   if such==2
     aim=$Map[$player[0]+1][$player[1]]
     if aim == 11
-      puts "You get the treasure!"
+      message("You got the treasure.\n")
       $bpack.push(Random.rand(25))
       $Map[$player[0]+1][$player[1]]=0
     end
@@ -190,12 +191,12 @@ def move(such)
       $foot=aim
     end
     if aim == 9
-      puts "You can goes to the next floor!"
+      message("You arrived at the next floor.\n")
       $floor=$floor+1
       mapGene()
     end
     if aim == 5
-      puts "Ouch!You stepped on the lava!"
+      message("You stepped on the lava and the lava hurt you.\n")
       $hp=$hp-10
       $Map[$player[0]][$player[1]]=$foot
       $player[0]=$player[0]+1
@@ -212,17 +213,17 @@ def move(such)
       $foot=aim
     end
     if aim == 11
-      puts "You get the treasure!"
+      message("You got the treasure.\n")
       $bpack.push(Random.rand(25))
       $Map[$player[0]][$player[1]-1]=0
     end
     if aim == 9
-      puts "You can goes to the next floor!"
+      message("You arrived at the next floor.\n")
       $floor=$floor+1
       mapGene()
     end
     if aim == 5
-      puts "Ouch!You stepped on the lava!"
+      message("You stepped on the lava and the lava hurt you.\n")
       $hp=$hp-10
       $Map[$player[0]][$player[1]]=$foot
       $player[1]=$player[1]-1
@@ -239,17 +240,17 @@ def move(such)
       $foot=aim
     end
     if aim == 11
-      puts "You get the treasure!"
+      message("You got the treasure.\n")
       $bpack.push(Random.rand(25))
       $Map[$player[0]][$player[1]+1]=0
     end
     if aim == 9
-      puts "You can goes to the next floor!"
+      message("You arrived at the next floor.\n")
       $floor=$floor+1
       mapGene()
     end
     if aim == 5
-      puts "Ouch!You stepped on the lava!"
+      message("You stepped on the lava and the lava hurt you.\n")
       $hp=$hp-10
       $Map[$player[0]][$player[1]]=$foot
       $player[1]=$player[1]+1
@@ -270,6 +271,14 @@ def showBpack()
   end
 end
 # ====
+# method:message
+# argument:content(str)
+# usage:use this to show the information in the next turn
+# ====
+def message(such)
+  $cache=such
+end
+# ====
 # method:magic
 # argument:magic code(int)
 # usage:use this to use magic according to the team setting
@@ -277,18 +286,18 @@ end
 def magic(such)
   if $team=="Chaos"
     if such == 1 && $hp <= 30
-      puts "You will die if you keep using this magic..."
+      message("You will die if you keep using this magic...\n")
     end
     if such == 2 && $mp <= 100
-      puts "You don't have enough magic."
+      message("You don't have enough magic.\n")
     end
     if such == 1 && $hp >= 30
-      puts "Bloody Magic!"
+      message("You used the Bloody Magic.\n")
       $hp=$hp-30
       $mp=$mp+20
     end
     if such == 2 && $mp >= 100
-      puts "Rebuild The World!"
+      message("You used the Rebuild The World.\n")
       $mp=$mp-100
       mapGene()
       $mp=$mp-50
@@ -296,18 +305,18 @@ def magic(such)
   end
   if $team=="Faith"
     if such == 1 && $mp <= 50
-      puts "You don't have enough magic."
+      message("You don't have enough magic.\n")
     end
     if such == 2 && $mp <= 100
-      puts "You don't have enough magic."
+      message("You don't have enough magic.\n")
     end
     if such == 1 && $mp >= 50
-      puts "Cure Magic!"
+      message("You used the Cure Magic.\n")
       $mp=$mp-40
       $hp=$hp+20
     end
     if such == 2 && $mp >= 100
-      puts "Rebuild The World!"
+      message("You used the Rebuild The World.\n")
       $mp=$mp-100
       mapGene()
       $mp=$mp-50
@@ -398,11 +407,13 @@ loop do
       end
     end
   end
-  if $hp==0
+  if $hp<=0
     gameOver()
   end
   loop do
     mapRend()
+    print $cache
+    $cache=""
     print "]"
     a=gets()
     if /^s/ =~ a
@@ -418,7 +429,11 @@ loop do
       showBpack()
     elsif /^m/ =~ a
       a.slice!(0)
-      move(a.to_i)
+      b=a.to_i()
+      if b!=1 && b!=2 && b!=3 && b!=4
+        puts "Error:Invalid Direction,The Direction can be only from 1 to 4."
+      end
+      move(b)
       break
     elsif /^u/ =~ a
       a.slice!(0)
